@@ -16,7 +16,7 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 use std::{
-    env, ffi::{CStr, CString}, num::NonZeroU32, ptr, sync::{Arc, Mutex}, str::FromStr
+    env, ffi::{CStr, CString}, num::NonZeroU32, ptr, sync::{Arc, Mutex}
 };
 
 #[cfg(target_os = "android")]
@@ -30,6 +30,9 @@ use log::LevelFilter;
 
 #[cfg(target_os = "android")]
 use android_logger::Config;
+
+#[cfg(target_os = "android")]
+use std::str::FromStr;
 
 
 #[no_mangle]
