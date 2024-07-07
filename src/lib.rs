@@ -16,8 +16,21 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 use std::{
-    env, ffi::{CStr, CString}, num::NonZeroU32, ptr, sync::{Arc, Mutex}
+    env, ffi::{CStr, CString}, num::NonZeroU32, ptr, sync::{Arc, Mutex}, str::FromStr
 };
+
+#[cfg(target_os = "android")]
+extern crate log;
+
+#[cfg(target_os = "android")]
+extern crate android_logger;
+
+#[cfg(target_os = "android")]
+use log::LevelFilter;
+
+#[cfg(target_os = "android")]
+use android_logger::Config;
+
 
 #[no_mangle]
 pub unsafe extern "C" fn smoldot_add_chain(chain_spec: *const libc::c_char) -> libc::size_t {
@@ -174,8 +187,20 @@ fn logger(level: &str) -> &'static Mutex<Logger> {
     static LOGGER: async_lock::OnceCell<Mutex<Logger>> = async_lock::OnceCell::new();
 
     LOGGER.get_or_init_blocking(|| {
+
+        #[cfg(not(target_os = "android"))]
         env::set_var("RUST_LOG", level);
+
+        #[cfg(not(target_os = "android"))]
         env_logger::Builder::from_env(env_logger::Env::default().default_filter_or("info")).init();
+
+        #[cfg(target_os = "android")]
+        android_logger::init_once(
+            Config::default()
+            .with_max_level(LevelFilter::from_str(&level).unwrap())
+            .with_tag("mytag") 
+        );
+
         Mutex::new(Logger {})
     })
 }
