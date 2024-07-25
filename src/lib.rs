@@ -201,7 +201,7 @@ fn logger(level: &str) -> &'static Mutex<Logger> {
         android_logger::init_once(
             Config::default()
             .with_max_level(LevelFilter::from_str(&level).unwrap())
-            .with_tag("mytag") 
+            .with_tag("smoldotkotlin") 
         );
 
         Mutex::new(Logger {})
